@@ -2,14 +2,16 @@ package api;
 
 import api.apis.BookingApi;
 import api.utils.JsonFileReader;
+import io.qameta.allure.Description;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
+@Listeners(api.utils.AllureReportListener.class)
 public class BookingTest {
     private static final Logger logger = LogManager.getLogger(BookingTest.class);
     private BookingApi bookingAPI;
@@ -24,6 +26,7 @@ public class BookingTest {
     }
 
     @Test
+    @Description("Create a booking with JSON payload and verify that it exists")
     public void testCreateBookingUsingJsonFile(){
         logger.info("Running test: testCreateBookingUsingJsonFile");
         String payload = JsonFileReader.readJson("src/test/resources/testdata/createBooking.json");
@@ -33,12 +36,14 @@ public class BookingTest {
         Assert.assertTrue(bookingId > 0, "Invalid booking id");
     }
     @Test
+    @Description("Create a booking with Empty JSON payload and verify it returns error")
     public void testCreateBookingUsingJson_EmptyPayload() {
         logger.info("Running test: testCreateBookingUsingJson_EmptyPayload");
         Response response = bookingAPI.createBooking(null);
         Assert.assertEquals(response.getStatusCode(), 400, "Booking creation should fail with empty payload with status code 400");
     }
     @Test (dependsOnMethods = {"testCreateBookingUsingJsonFile"})
+    @Description("Verify created booking exists")
     public void testBookingIdIsCreated(){
         logger.info("Running test: testBookingIdIsCreated");
         Response response = bookingAPI.getBooking(this.bookingId);
@@ -47,6 +52,7 @@ public class BookingTest {
 
     }
     @Test
+    @Description("Create a booking with Truncated JSON payload and verify it returns error")
     public void testCreateBookingUsingJson_MalformedJson() {
         logger.info("Running test: testCreateBookingUsingJson_MalformedJson");
         String malformedJson = "{ \"firstname\": \"Jane\", \"lastname\": \"Doe\", "; // Truncated JSON

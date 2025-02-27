@@ -30,4 +30,17 @@ public class BookingTest {
         int bookingId = response.jsonPath().getInt("bookingid");
         Assert.assertTrue(bookingId > 0, "Invalid booking id");
     }
+    @Test
+    public void testCreateBookingUsingJson_EmptyPayload() {
+        logger.info("Running test: testCreateBookingUsingJson_EmptyPayload");
+        Response response = bookingAPI.createBooking(null);
+        Assert.assertEquals(response.getStatusCode(), 400, "Booking creation should fail with empty payload with status code 400");
+    }
+    @Test
+    public void testCreateBookingUsingJson_MalformedJson() {
+        logger.info("Running test: testCreateBookingUsingJson_MalformedJson");
+        String malformedJson = "{ \"firstname\": \"Jane\", \"lastname\": \"Doe\", "; // Truncated JSON
+        Response response = bookingAPI.createBooking(malformedJson);
+        Assert.assertEquals(response.getStatusCode(), 400, "Booking creation should fail with malformed JSON witg status code 400");
+    }
 }

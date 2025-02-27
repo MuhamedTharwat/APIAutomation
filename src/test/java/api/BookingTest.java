@@ -13,6 +13,7 @@ import org.testng.annotations.Test;
 public class BookingTest {
     private static final Logger logger = LogManager.getLogger(BookingTest.class);
     private BookingApi bookingAPI;
+    private int bookingId;
     @BeforeClass
     public void setup() {
         // Configure base URI (update as needed)
@@ -24,10 +25,11 @@ public class BookingTest {
 
     @Test
     public void testCreateBookingUsingJsonFile(){
+        logger.info("Running test: testCreateBookingUsingJsonFile");
         String payload = JsonFileReader.readJson("src/test/resources/testdata/createBooking.json");
         Response response = bookingAPI.createBooking(payload);
         Assert.assertEquals(response.getStatusCode(), 200, "Booking creation using external JSON failed");
-        int bookingId = response.jsonPath().getInt("bookingid");
+        this.bookingId = response.jsonPath().getInt("bookingid");
         Assert.assertTrue(bookingId > 0, "Invalid booking id");
     }
     @Test
@@ -35,6 +37,14 @@ public class BookingTest {
         logger.info("Running test: testCreateBookingUsingJson_EmptyPayload");
         Response response = bookingAPI.createBooking(null);
         Assert.assertEquals(response.getStatusCode(), 400, "Booking creation should fail with empty payload with status code 400");
+    }
+    @Test (dependsOnMethods = {"testCreateBookingUsingJsonFile"})
+    public void testBookingIdIsCreated(){
+        logger.info("Running test: testBookingIdIsCreated");
+        Response response = bookingAPI.getBooking(this.bookingId);
+        Assert.assertEquals(response.getStatusCode(), 200, "Booking ID not found");
+
+
     }
     @Test
     public void testCreateBookingUsingJson_MalformedJson() {

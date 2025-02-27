@@ -26,4 +26,18 @@ public class BookingApi {
             throw e;
         }
     }
+    public Response getBooking(int bookingId) {
+        logger.info("Getting booking details for booking ID: {}", bookingId);
+        try {
+            Response response = new RequestBuilder()
+                    .setEndpoint("/booking/" + bookingId)
+                    .setHttpMethod("GET")
+                    .execute();
+            logger.info("Booking details retrieved successfully. Status code: {} ,{}", response.getStatusCode(),response.body().prettyPrint());
+            return response;
+        } catch (Exception e) {
+            logger.error("Error getting booking details: {}", e.getMessage());
+            throw e;
+        }
+    }
 }
